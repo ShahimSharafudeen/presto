@@ -39,6 +39,7 @@ public class OracleClientModule
     {
         binder.bind(JdbcClient.class).to(OracleClient.class)
                 .in(Scopes.SINGLETON);
+
         configBinder(binder).bindConfig(BaseJdbcConfig.class);
         configBinder(binder).bindConfig(OracleConfig.class);
     }
