@@ -19,6 +19,13 @@
 
     <inceptionYear>2012</inceptionYear>
 
+    <repositories>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <licenses>
         <license>
             <name>Apache License 2.0</name>
@@ -1497,9 +1504,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.facebook.airlift.resolver</groupId>
+                <groupId>com.github.ShahimSharafudeen.resolvertest</groupId>
                 <artifactId>resolver</artifactId>
-                <version>1.7</version>
+                <version>resolver_1.7_fix-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.google.inject</groupId>
