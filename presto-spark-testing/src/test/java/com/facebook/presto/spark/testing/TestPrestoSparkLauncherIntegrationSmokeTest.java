@@ -278,21 +278,39 @@ public class TestPrestoSparkLauncherIntegrationSmokeTest
                 "-v", format("%s:/presto/etc/catalogs", catalogDirectory.getAbsolutePath()),
                 "-v", format("%s:/presto/etc/session-property-config.properties", sessionPropertyConfig.getAbsolutePath()),
                 "-v", format("%s:/presto/etc/session-property-config.json", sessionPropertyConfigJsonFile.getAbsolutePath()),
+                "-v", format("%s:/root/.m2", System.getProperty("user.home") + "/.m2"),
                 "spark-submit",
-                "/opt/spark/bin/spark-submit",
-                "--executor-memory", "512m",
-                "--executor-cores", "4",
-                "--conf", "spark.task.cpus=4",
-                "--master", "spark://spark-master:7077",
-                "--class", "com.facebook.presto.spark.launcher.PrestoSparkLauncher",
-                "/presto/launcher.jar",
-                "--package", "/presto/package.tar.gz",
-                "--config", "/presto/etc/config.properties",
-                "--catalogs", "/presto/etc/catalogs",
-                "--catalog", "hive",
-                "--schema", "default",
-                "--session-property-config", "/presto/etc/session-property-config.properties",
-                "--file", "/presto/query.sql");
+                "bash",
+                "-c",
+                ""
+                        + "echo 'Starting Spark job'; "
+                        + "/opt/spark/bin/spark-submit "
+                        + "--executor-memory 512m "
+                        + "--executor-cores 4 "
+                        + "--conf spark.task.cpus=4 "
+                        + "--conf rootLogger.appenderRef.stdout.ref=console "
+                        + "--conf rootLogger.level=debug "
+                        + "--conf spark.driver.extraClassPath=/root/.m2/repository/* "
+                        + "--conf spark.executor.extraClassPath=/root/.m2/repository/* "
+                        + "--conf spark.driver.userClassPathFirst=true "
+                        + "--conf spark.executor.userClassPathFirst=true "
+                        + "--conf spark.driver.extraJavaOptions=\"-Dmaven.repo.local=/root/.m2 -Duser.home=/root\" "
+                        + "--conf spark.executor.extraJavaOptions=\"-Dmaven.repo.local=/root/.m2 -Duser.home=/root\" "
+                        + "--master spark://spark-master:7077 "
+                        + "--class com.facebook.presto.spark.launcher.PrestoSparkLauncher "
+                        + "/presto/launcher.jar "
+                        + "--package /presto/package.tar.gz "
+                        + "--config /presto/etc/config.properties "
+                        + "--catalogs /presto/etc/catalogs "
+                        + "--catalog hive "
+                        + "--schema default "
+                        + "--session-property-config /presto/etc/session-property-config.properties "
+                        + "--file /presto/query.sql "
+                        + "; "
+                        + "EXIT_CODE=$?; "
+                        + "echo Exit code: $EXIT_CODE; "
+                        + "echo 'Debug mode — container will stay alive'; "
+                        + "tail -f /dev/null");
         assertEquals(exitCode, 0);
     }
 
